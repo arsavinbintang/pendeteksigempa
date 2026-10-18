@@ -17,10 +17,19 @@ export const EarthquakeRiskCard: React.FC<EarthquakeRiskCardProps> = ({
   currentVibration,
   peakValue,
 }) => {
-  const isDanger = status === "BAHAYA" || riskPercentage >= 70;
-  const isWarn = (status === "WASPADA" || riskPercentage >= 30) && !isDanger;
+  const isDanger = status === "BAHAYA" || riskPercentage >= 80;
+  const isWarn = !isDanger && (status === "WASPADA" || riskPercentage >= 50);
 
   const activeColor = isDanger ? "#FF2E63" : isWarn ? "#FFB703" : "#00FF99";
+
+  // Dynamic solid color based on risk percentage:
+  // Solid Hijau (< 50%), Solid Kuning (50% - 79%), Solid Merah (>= 80%)
+  const progressBarColor =
+    riskPercentage >= 80
+      ? "bg-nerv-danger shadow-[0_0_8px_rgba(255,46,99,0.45)]"
+      : riskPercentage >= 50
+      ? "bg-nerv-warn shadow-[0_0_8px_rgba(255,183,3,0.35)]"
+      : "bg-nerv-safe shadow-[0_0_8px_rgba(0,255,153,0.25)]";
 
   return (
     <div className="flex flex-col justify-between p-6 bg-[#161B22] rounded-2xl border border-nerv-surfaceBorder shadow-xl relative overflow-hidden">
@@ -78,7 +87,7 @@ export const EarthquakeRiskCard: React.FC<EarthquakeRiskCardProps> = ({
         </div>
       </div>
 
-      {/* Segmented Progress Bar */}
+      {/* Dynamic Solid Progress Bar */}
       <div className="w-full my-3">
         <div className="flex justify-between text-[10px] font-mono text-nerv-subtle mb-1">
           <span>0% (Stabil)</span>
@@ -88,14 +97,8 @@ export const EarthquakeRiskCard: React.FC<EarthquakeRiskCardProps> = ({
 
         <div className="w-full h-3 bg-[#0D0F12] rounded-full overflow-hidden border border-nerv-surfaceBorder p-0.5">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              isDanger
-                ? "bg-gradient-to-r from-nerv-warn to-nerv-danger animate-pulse"
-                : isWarn
-                ? "bg-gradient-to-r from-nerv-safe to-nerv-warn"
-                : "bg-nerv-safe"
-            }`}
-            style={{ width: `${Math.min(100, Math.max(5, riskPercentage))}%` }}
+            className={`h-full rounded-full transition-all duration-500 ${progressBarColor}`}
+            style={{ width: `${Math.min(100, Math.max(2, riskPercentage))}%` }}
           />
         </div>
       </div>

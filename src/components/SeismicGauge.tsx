@@ -25,8 +25,8 @@ export const SeismicGauge: React.FC<SeismicGaugeProps> = ({
   const arcLength = 2 * Math.PI * radius * (240 / 360);
   const strokeOffset = arcLength - (clamped / 1000) * arcLength;
 
-  const isDanger = status === "BAHAYA";
-  const isWarn = status === "WASPADA";
+  const isDanger = status === "BAHAYA" || vibration >= 300;
+  const isWarn = !isDanger && (status === "WASPADA" || vibration >= 100);
   const activeColor = isDanger ? "#FF2E63" : isWarn ? "#FFB703" : "#00FF99";
 
   return (
@@ -47,46 +47,21 @@ export const SeismicGauge: React.FC<SeismicGaugeProps> = ({
       {/* SVG Arc Gauge */}
       <div className="relative w-56 h-48 flex items-center justify-center">
         <svg viewBox="0 0 200 160" className="w-full h-full">
-          {/* Background Track Arc */}
+          {/* Background Track Arc - Minimalist Neutral Line */}
           <path
             d="M 30.7 130 A 80 80 0 1 1 169.3 130"
             fill="none"
-            stroke="#272E3B"
-            strokeWidth="14"
+            stroke="#2A323D"
+            strokeWidth="3.5"
             strokeLinecap="round"
           />
 
-          {/* Color Segments Indicator Dots/Ticks */}
-          {/* Safe Zone (0 - 99: ~10% of 240deg = 24deg) */}
-          <path
-            d="M 30.7 130 A 80 80 0 0 1 45 92"
-            fill="none"
-            stroke="rgba(0, 255, 153, 0.3)"
-            strokeWidth="14"
-            strokeLinecap="round"
-          />
-          {/* Warning Zone (100 - 299: ~20% of 240deg = 48deg) */}
-          <path
-            d="M 46 88 A 80 80 0 0 1 95 40"
-            fill="none"
-            stroke="rgba(255, 183, 3, 0.3)"
-            strokeWidth="14"
-          />
-          {/* Danger Zone (300 - 1000: ~70% of 240deg) */}
-          <path
-            d="M 100 40 A 80 80 0 0 1 169.3 130"
-            fill="none"
-            stroke="rgba(255, 46, 99, 0.3)"
-            strokeWidth="14"
-            strokeLinecap="round"
-          />
-
-          {/* Active Level Arc */}
+          {/* Active Level Arc - Status Glowing Stroke */}
           <path
             d="M 30.7 130 A 80 80 0 1 1 169.3 130"
             fill="none"
             stroke={activeColor}
-            strokeWidth="14"
+            strokeWidth="3.5"
             strokeLinecap="round"
             strokeDasharray={arcLength}
             strokeDashoffset={strokeOffset}
@@ -96,25 +71,39 @@ export const SeismicGauge: React.FC<SeismicGaugeProps> = ({
             }}
           />
 
-          {/* Needle Center Pin */}
-          <circle cx="100" cy="120" r="7" fill="#E6EDF3" />
-          <circle cx="100" cy="120" r="3" fill="#0D0F12" />
-
-          {/* Rotating Needle Indicator */}
+          {/* Rotating Indicator Node (Lingkaran Titik Penunjuk) */}
           <g
-            transform={`rotate(${angle} 100 120)`}
-            style={{ transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+            transform={`rotate(${angle} 100 90)`}
+            style={{
+              transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
           >
-            <line
-              x1="100"
-              y1="120"
-              x2="100"
-              y2="52"
-              stroke="#FFF"
-              strokeWidth="2.5"
-              strokeLinecap="round"
+            {/* Outer Glow Ring */}
+            <circle
+              cx="100"
+              cy="10"
+              r="8"
+              fill={activeColor}
+              fillOpacity="0.25"
+              style={{
+                transition: "fill 0.3s ease",
+              }}
             />
-            <polygon points="100,46 97,55 103,55" fill={activeColor} />
+            {/* Solid Node */}
+            <circle
+              cx="100"
+              cy="10"
+              r="4.5"
+              fill={activeColor}
+              stroke="#0D0F12"
+              strokeWidth="1.5"
+              style={{
+                filter: `drop-shadow(0 0 6px ${activeColor})`,
+                transition: "fill 0.3s ease",
+              }}
+            />
+            {/* Inner Core Highlight */}
+            <circle cx="100" cy="10" r="1.5" fill="#FFFFFF" />
           </g>
         </svg>
 
@@ -136,7 +125,7 @@ export const SeismicGauge: React.FC<SeismicGaugeProps> = ({
       <div className="w-full grid grid-cols-3 gap-1.5 mt-2 text-center text-[10px] font-mono">
         <div
           className={`py-1.5 px-1 rounded border transition-all ${
-            status === "AMAN"
+            !isWarn && !isDanger
               ? "bg-nerv-safe/20 border-nerv-safe text-nerv-safe font-bold"
               : "bg-[#0D0F12] border-nerv-surfaceBorder text-gray-400"
           }`}
@@ -147,7 +136,7 @@ export const SeismicGauge: React.FC<SeismicGaugeProps> = ({
 
         <div
           className={`py-1.5 px-1 rounded border transition-all ${
-            status === "WASPADA"
+            isWarn
               ? "bg-nerv-warn/20 border-nerv-warn text-nerv-warn font-bold"
               : "bg-[#0D0F12] border-nerv-surfaceBorder text-gray-400"
           }`}
@@ -158,7 +147,7 @@ export const SeismicGauge: React.FC<SeismicGaugeProps> = ({
 
         <div
           className={`py-1.5 px-1 rounded border transition-all ${
-            status === "BAHAYA"
+            isDanger
               ? "bg-nerv-danger/20 border-nerv-danger text-nerv-danger font-bold animate-pulse"
               : "bg-[#0D0F12] border-nerv-surfaceBorder text-gray-400"
           }`}
