@@ -121,7 +121,7 @@ export const SeismicRadar: React.FC<SeismicRadarProps> = ({ status, vibration })
 
       {/* Radar Bottom Metadata */}
       <div className="w-full flex items-center justify-between text-[11px] font-mono text-nerv-subtle border-t border-nerv-surfaceBorder/80 pt-3 mt-2">
-        <span>LOC: -6.2088° S, 106.8456° E</span>
+        <span>LOC: -6.9932° S, 110.4203° E (SEMARANG)</span>
         <span className="text-nerv-cyan font-semibold">RANGE: 50 KM</span>
         <span style={{ color: themeColor }}>
           STATUS: {status}

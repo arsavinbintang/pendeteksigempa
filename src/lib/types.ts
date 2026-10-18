@@ -35,6 +35,11 @@ export interface WeatherData {
   temperature: number;
   humidity: number;
   windSpeed: number;
+  windDirection?: number;
+  windDirectionCardinal?: string;
+  windDirectionLabel?: string;
+  windGusts?: number;
+  windLevel?: string;
   condition: string;
   weatherCode: number;
   isDay: boolean;
